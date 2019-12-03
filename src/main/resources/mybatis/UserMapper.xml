@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="mybatis_test.dao_service.UserService">
+    <!-- 实体类一定要有无参构造器 -->
+    <resultMap type="mybatis_test.entity.User" id="userResultMap">
+        <id column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="account_status" property="accountStatus"/>
+        <result column="role" property="userRole"/>
+        <association property="userRole" resultMap="userRoleResultMap">
+        </association>
+
+        <association property="bankAccount" resultMap="bankAccountResultMap">
+        </association>
+    </resultMap>
+
+    <resultMap type="mybatis_test.entity.BankAccount" id="bankAccountResultMap">
+        <id column="account_id" property="accountId"/>
+        <result column="holder_name" property="holderName"/>
+        <result column="balance" property="balance"/>
+        <result column="auth_string" property="authString"/>
+        <result column="create_date" property="createDate"/>
+    </resultMap>
+
+    <resultMap type="string" id="userRoleResultMap">
+        <result column="role" property="userRole"/>
+    </resultMap>
+
+
+    <select id="findUserById" resultMap="userResultMap" >
+        SELECT S.user_id, S.user_name, S.password, S.account_status,
+        R.role,
+        B.account_id, B.holder_name, B.balance, B.auth_string, B.create_date
+        FROM spring_users S, bank_account B, user_role R
+        WHERE S.user_id = #{id}
+        AND S.user_role_id = R.role_id
+        AND S.user_id = B.account_id
+    </select>
+
+    <select id="findUserById2" resultMap="userResultMap" >
+        SELECT S.user_id, S.user_name, S.password, S.account_status,
+        R.role
+        FROM spring_users S, user_role R
+        WHERE S.user_id = #{id}
+        AND S.user_role_id = R.role_id
+    </select>
+
+
+    <select id="findBankAccountById" resultMap="bankAccountResultMap" >
+        select * from bank_account where account_id = #{id}
+    </select>
+
+
+</mapper>
