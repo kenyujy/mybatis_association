@@ -9,11 +9,12 @@
         <result column="password" property="password"/>
         <result column="account_status" property="accountStatus"/>
         <result column="role" property="userRole"/>
-        <association property="userRole" resultMap="userRoleResultMap">
-        </association>
+        <association property="userRole" resultMap="userRoleResultMap"/>
+        <association property="bankAccount" resultMap="bankAccountResultMap"/>
+    </resultMap>
 
-        <association property="bankAccount" resultMap="bankAccountResultMap">
-        </association>
+    <resultMap type="string" id="userRoleResultMap">
+        <result column="role" property="userRole"/>
     </resultMap>
 
     <resultMap type="mybatis_test.entity.BankAccount" id="bankAccountResultMap">
@@ -24,8 +25,9 @@
         <result column="create_date" property="createDate"/>
     </resultMap>
 
-    <resultMap type="string" id="userRoleResultMap">
-        <result column="role" property="userRole"/>
+    <resultMap type="mybatis_test.entity.Friend" id="friendListResultMap">
+        <id column="user_id" property="id"/>
+        <result column="user_name" property="name"/>
     </resultMap>
 
 
@@ -39,18 +41,15 @@
         AND S.user_id = B.account_id
     </select>
 
-    <select id="findUserById2" resultMap="userResultMap" >
-        SELECT S.user_id, S.user_name, S.password, S.account_status,
-        R.role
-        FROM spring_users S, user_role R
-        WHERE S.user_id = #{id}
-        AND S.user_role_id = R.role_id
-    </select>
-
-
     <select id="findBankAccountById" resultMap="bankAccountResultMap" >
         select * from bank_account where account_id = #{id}
     </select>
 
+    <select id="findFriendListById" resultMap="friendListResultMap" >
+        SELECT S.user_id, S.user_name
+        FROM spring_users S
+        WHERE S.user_id IN
+        (SELECT F.friend_id FROM friend_list F WHERE F.user_id = #{id})
+    </select>
 
 </mapper>
